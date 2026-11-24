@@ -1,0 +1,43 @@
+fecha,region,ciudad,temperatura_media_c,temperatura_max_c,temperatura_min_c,lluvia_mm
+2026-11-16,AMBA,Buenos Aires,24.7,31.6,19.1,0.0
+2026-11-17,AMBA,Buenos Aires,25.4,32.8,18.8,19.2
+2026-11-18,AMBA,Buenos Aires,23.7,30.4,18.4,0.0
+2026-11-19,AMBA,Buenos Aires,27.1,33.1,19.4,6.9
+2026-11-20,AMBA,Buenos Aires,23.1,31.1,16.6,0.0
+2026-11-21,AMBA,Buenos Aires,20.6,26.4,12.9,0.0
+2026-11-22,AMBA,Buenos Aires,22.6,30.5,15.1,0.0
+2026-11-16,Centro,Córdoba,21.5,29.1,16.2,0.0
+2026-11-17,Centro,Córdoba,25.8,33.6,18.7,0.0
+2026-11-18,Centro,Córdoba,24.1,32.1,16.2,0.0
+2026-11-19,Centro,Córdoba,22.1,27.5,15.4,0.0
+2026-11-20,Centro,Córdoba,21.8,27.4,16.8,0.0
+2026-11-21,Centro,Córdoba,24.7,30.3,19.5,3.4
+2026-11-22,Centro,Córdoba,23.3,31.2,16.2,0.0
+2026-11-16,Litoral,Rosario,24.4,30.2,17.1,0.0
+2026-11-17,Litoral,Rosario,24.1,31.3,19.0,57.9
+2026-11-18,Litoral,Rosario,22.2,27.7,15.0,0.0
+2026-11-19,Litoral,Rosario,23.4,30.8,17.7,0.0
+2026-11-20,Litoral,Rosario,23.0,28.0,15.0,1.5
+2026-11-21,Litoral,Rosario,20.9,26.4,15.0,0.0
+2026-11-22,Litoral,Rosario,30.8,36.8,25.4,0.0
+2026-11-16,Cuyo,Mendoza,23.8,29.6,16.5,2.0
+2026-11-17,Cuyo,Mendoza,24.3,31.5,17.9,0.0
+2026-11-18,Cuyo,Mendoza,21.5,29.2,15.3,0.0
+2026-11-19,Cuyo,Mendoza,24.1,31.0,17.4,0.0
+2026-11-20,Cuyo,Mendoza,21.1,28.3,14.1,0.0
+2026-11-21,Cuyo,Mendoza,22.0,27.1,14.6,0.0
+2026-11-22,Cuyo,Mendoza,19.6,26.3,12.2,0.0
+2026-11-16,NOA,San Miguel de Tucumán,28.5,34.9,22.0,7.2
+2026-11-17,NOA,San Miguel de Tucumán,29.5,34.6,23.7,0.0
+2026-11-18,NOA,San Miguel de Tucumán,25.8,32.7,20.5,0.0
+2026-11-19,NOA,San Miguel de Tucumán,25.6,33.1,19.3,0.0
+2026-11-20,NOA,San Miguel de Tucumán,21.7,29.6,14.1,0.0
+2026-11-21,NOA,San Miguel de Tucumán,28.4,34.4,20.6,6.6
+2026-11-22,NOA,San Miguel de Tucumán,19.4,26.9,13.0,9.4
+2026-11-16,Patagonia,Neuquén,17.2,23.6,11.3,2.3
+2026-11-17,Patagonia,Neuquén,13.1,20.0,5.2,0.0
+2026-11-18,Patagonia,Neuquén,14.0,20.7,8.1,6.5
+2026-11-19,Patagonia,Neuquén,16.5,23.8,11.3,0.8
+2026-11-20,Patagonia,Neuquén,16.5,21.9,10.0,0.0
+2026-11-21,Patagonia,Neuquén,18.0,23.3,12.4,0.0
+2026-11-22,Patagonia,Neuquén,22.5,30.5,14.8,0.0

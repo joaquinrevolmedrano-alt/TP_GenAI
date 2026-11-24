@@ -1,0 +1,33 @@
+# TP Aplicaciones de IA Generativa: sistema multiagente Hornero
+# Instalación: pip install -r requirements.txt
+
+python-dotenv
+pandas
+numpy
+
+# LLM y agentes
+groq
+langchain
+langchain-groq
+langgraph
+
+# Agente SQL (SQLDatabaseToolkit, Clase 4)
+langchain-community
+sqlalchemy
+
+# MCP: cliente y server de clima ya hecho (Open-Meteo, sin API key)
+langchain-mcp-adapters
+mcp_weather_server
+
+# RAG
+pdfplumber
+sentence-transformers
+faiss-cpu
+
+# Machine learning
+scikit-learn
+lightgbm
+joblib
+
+# App
+streamlit

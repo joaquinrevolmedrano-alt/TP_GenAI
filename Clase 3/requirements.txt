@@ -1,0 +1,54 @@
+# Aplicaciones de IA Generativa — UTDT 2026
+# Instalación: pip install -r requirements.txt
+
+# Entorno y variables de entorno
+python-dotenv
+
+# Manejo de datos
+pandas
+numpy
+
+# LLM provider
+groq
+
+# Google AI
+google-adk
+google-genai
+
+# Agentes con LangChain
+langchain
+langchain-groq
+
+# Clase 4: tool prearmada de SQL (SQLDatabaseToolkit)
+langchain-community
+sqlalchemy
+
+# Embeddings open source
+sentence-transformers
+
+# Vector store local
+faiss-cpu
+
+# Extracción de texto de PDFs
+pdfplumber
+
+# ML utilities
+scikit-learn
+lightgbm
+
+# Word2Vec
+gensim
+
+# Visualización
+matplotlib
+
+# Jupyter
+jupyter
+ipykernel
+
+# TP: multiagente (LangGraph), MCP y app
+langgraph
+mcp[cli]
+langchain-mcp-adapters
+mcp_weather_server
+streamlit
