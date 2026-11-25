@@ -66,3 +66,33 @@ Probamos dos pedidos independientes con create_agent, Groq openai/gpt-oss-20b, t
 consultar_historial lee el CSV en cada llamada para ver nuevas aprobaciones. Filtra por canal y segmento opcionales e incluye piezas dirigidas a Todos cuando busca para un segmento concreto. Devuelve hasta tres antecedentes por fecha descendente, con título y hasta 320 caracteres de texto para acotar el contexto. Una campaña anterior puede quedar fuera de esa ventana.
 
 En una prueba aislada con Groq, el modelo eligió Push y Recurrentes, recuperó el push del 20/10 e identificó su título y llamado a la acción como elementos a evitar. Sugirió como alternativa una oferta exclusiva sin sustento en el pedido. En el brief final habrá que controlar que las ideas respeten los hechos autorizados. Se comprobó también una búsqueda sin coincidencias y la inclusión de comunicaciones a Todos.
+
+## Prototipo del estratega
+
+Implementamos un brief validado con Pydantic y ToolStrategy para pasar campos específicos al redactor. En el push oficial, la primera corrida consultó guía e historial, recuperó «Preparate para el calor» y los límites 40/90, pero propuso una línea nueva, eficiencia energética y garantía de postventa sin respaldo. Tras reforzar el prompt, la segunda corrida mantuvo los límites y consignó tema, canal y segmento, pero omitió la consulta al historial y sugirió control inteligente y eficiencia energética. El esquema asegura la forma del brief. La obligatoriedad de las consultas y el respaldo de las afirmaciones quedan pendientes antes de integrar el redactor.
+
+## Evidencia obligatoria antes de elaborar el brief
+
+preparar_brief invoca ambas tools desde Python y entrega el pedido y sus resultados al estratega. Por ahora el llamador suministra canal, segmento y promoción. En la primera prueba con evidencia precargada se recuperó el antecedente del 20/10, pero el brief todavía sugirió ahorro y facilidad de instalación. Pedimos una sola acción útil y dimos como ejemplo medir el espacio disponible. La segunda prueba conservó el antecedente y los límites 40/90 y elaboró ese consejo sin afirmar prestaciones. Es una prueba con un ejemplo explícito en el prompt. El modelo todavía mezcló reglas de canal en hechos_autorizados. Quedan por validar otros pedidos y el tratamiento de hechos antes de pasar el brief al redactor.
+
+## Separación de fuentes en el brief
+
+Python conserva el pedido original, los filtros, la guía recuperada y el historial en campos separados. El modelo genera únicamente objetivo, enfoque, antecedentes a evitar y datos faltantes. Así, los datos comerciales se contrastan con el pedido original y las reglas conservan el texto de la guía. Se mantiene el alcance de la materia: RAG, tools, prompts y transferencia explícita de contexto entre agentes.
+
+Probamos el push y el email de recuperación con Groq y con filtros suministrados por el llamador. Ambos conservaron el pedido y las reglas obligatorias del canal. Al generalizar el prompt y quitar el ejemplo de aires, el push volvió a sugerir cuotas y ahorro sin respaldo. En el email, el agente propuso un cupón y un destino de enlace sin registrarlos como datos faltantes. La separación de fuentes permite revisar esas afirmaciones contra el pedido, pero la estrategia generada sigue requiriendo revisión. Antes de aprobar o guardar, el flujo debe tratar como pendiente cualquier beneficio o dato indispensable sin respaldo.
+
+## Integración en Streamlit
+
+La Etapa 1 usa StateGraph para ejecutar estratega, redactor y revisor. El estratega identifica los campos del pedido y carga guía e historial. El redactor recibe el pedido, las reglas y la estrategia. El revisor recibe el borrador, el pedido, las reglas y un antecedente. Un contador de Python limita la devolución al redactor a una ronda. El código comprueba los largos del canal y solo invoca la escritura si hay veredicto favorable y pedido de guardado.
+
+En un CSV temporal, verificamos que dos pedidos de corrección terminan sin agregar filas, que corrección seguida de aprobación agrega una fila y que pedir datos termina sin agregar filas. En Streamlit, el primer push quedó pendiente tras dos revisiones por largo. Después de precisar el máximo y las observaciones, otro push y un post de Instagram obtuvieron aprobación del modelo. La revisión humana detectó tuteo en el push y acceso anticipado sin sustento en Instagram. Se reforzaron ambos prompts en esos puntos. El email terminó pendiente y su observación llegó a sugerir un cupón sin respaldo. El caso WhatsApp encontró un error del proveedor durante la tanda. Se agregó manejo de errores de Groq en la interfaz. Las aprobaciones del modelo siguen necesitando contraste con la guía y el pedido.
+
+En la corrida posterior, el revisor confundió «Elegí» con tuteo. Añadimos formas correctas y formas a corregir al prompt del revisor. La calidad lingüística sigue pendiente de validación con el prompt actualizado. La app responde en localhost:8502 y la prueba de escritura usó un archivo temporal.
+
+## Correcciones a partir de la prueba manual en Streamlit
+
+El push aprobado incluyó «cada 15 días» y «Abre la app». El WhatsApp quedó pendiente sin pedir claramente el enlace. Adelantamos la comprobación de datos del descuento al estratega: para WhatsApp sin enlace, pide el enlace y termina antes de redactar o guardar. En push, el código marca para corregir duraciones numéricas ausentes del pedido y la etiqueta literal «Abre la app». Son controles acotados y no validan todas las afirmaciones posibles. Ambas rutas se comprobaron con respuestas simuladas del modelo.
+
+## Borrador visible cuando falta el enlace de WhatsApp
+
+En una prueba manual, el chat mostró solo el veredicto y dejó en el detalle un borrador con fechas y URL ficticias. El caso WhatsApp con descuento sin enlace ahora muestra en el mensaje principal una plantilla pendiente de aprobación con un marcador de enlace. Python reutiliza el porcentaje y las categorías reconocidas cuando aparecen explícitamente. AppTest verificó el pedido del 15 % en Cocina con clasificación simulada, sin escritura en el CSV.

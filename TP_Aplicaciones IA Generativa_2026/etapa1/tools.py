@@ -69,3 +69,15 @@ def consultar_historial(
     piezas.sort(key=lambda pieza: pieza["fecha"], reverse=True)
     return [{**{k: fila[k] for k in ("fecha", "canal", "segmento", "titulo")},
              "extracto": fila["texto"][:320]} for fila in piezas[:3]]
+
+
+@tool
+def guardar_pieza(canal: str, segmento: str, titulo: str, texto: str) -> str:
+    """Agrega una pieza aprobada al historial editorial."""
+    from datetime import datetime
+
+    with HISTORIAL.open("a", encoding="utf-8", newline="") as archivo:
+        csv.writer(archivo).writerow([
+            datetime.now().strftime("%Y-%m-%d %H:%M"), canal, segmento, titulo, texto,
+        ])
+    return "Pieza guardada."
