@@ -1,5 +1,24 @@
 # Hornero · Decisiones de diseño de la Etapa 1
 
+Bitácora histórica compartida del equipo. El estado vigente y los responsables se
+mantienen en `../../docs/ROADMAP.md`; las notas anteriores pueden describir pasos
+que luego se completaron o decisiones que se reemplazaron. Agregar nuevas entradas
+con fecha, tarea, decisión, alternativa y evidencia de pruebas.
+
+## Verificación técnica del 26/11/2026 · E1-03
+
+Se verificó en Windows/Python 3.12.10 con entorno en una ruta corta. Seis pruebas
+reproducibles en `../tests/test_funcionamiento.py` pasaron sin API, con respuestas
+simuladas y CSV temporal. `../scripts/verificar_funcionamiento.py --live` comprobó
+imports, arranque de ambas interfaces, extracción del PDF, 26 chunks, embeddings,
+construcción/recarga FAISS y lectura/escritura temporal. Una consulta real a Groq
+completó estratega, redactor y revisor en 4,7 s. Se corrigió UTF-8 explícito en el
+JSON del índice. El CSV original quedó intacto con ocho filas.
+
+También se comprobó HTTP 200 del servidor Streamlit y se detuvo el proceso de prueba.
+Esta verificación no evalúa tono, hechos ni calidad editorial y no cierra E1-04.
+El detalle del entorno y los límites está en `../../docs/BITACORA.md`.
+
 ## Paso 1 · Entorno y arquitectura (24/11/2026)
 
 Usamos el entorno virtual compartido de la materia con Python 3.11.15. Consideramos crear uno exclusivo para el TP. La simulación de instalación conjunta resolvió los requisitos sin reemplazar versiones existentes. Después de instalar Streamlit, los 196 paquetes pasaron la comprobación de compatibilidad. En la app base, la pregunta sobre la fecha produjo una llamada a fecha_de_hoy y una respuesta. Queda por probar la ejecución independiente desde etapa1/ una vez armada.

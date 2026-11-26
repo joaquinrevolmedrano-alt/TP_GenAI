@@ -1,0 +1,30 @@
+# Credenciales locales (la plantilla sí se comparte)
+.env
+.env.*
+!.env.example
+
+# Entornos y cachés de Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Configuración local y secretos de Streamlit
+.streamlit/secrets.toml
+.vscode/
+.idea/
+
+# Archivos locales y resultados temporales
+.DS_Store
+Thumbs.db
+*.log
+.cache/
+.coverage
+htmlcov/
+
+# Índices regenerables; los ya versionados se conservan por ahora
+TP_Aplicaciones IA Generativa_2026/etapa1/indices/

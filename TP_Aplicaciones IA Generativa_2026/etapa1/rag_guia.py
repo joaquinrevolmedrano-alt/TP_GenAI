@@ -64,7 +64,8 @@ def abrir_indice(modelo):
             carpeta = Path(tmp) / "guia"
             carpeta.mkdir()
             faiss.write_index(indice, str(carpeta / "guia.faiss"))
-            (carpeta / "chunks.json").write_text(json.dumps(chunks, ensure_ascii=False, indent=2))
+            (carpeta / "chunks.json").write_text(
+                json.dumps(chunks, ensure_ascii=False, indent=2), encoding="utf-8")
             try:
                 carpeta.rename(destino)
             except OSError:
@@ -73,7 +74,8 @@ def abrir_indice(modelo):
         print("Índice construido")
     else:
         print("Índice reutilizado")
-    return faiss.read_index(str(destino / "guia.faiss")), json.loads((destino / "chunks.json").read_text())
+    return faiss.read_index(str(destino / "guia.faiss")), json.loads(
+        (destino / "chunks.json").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
