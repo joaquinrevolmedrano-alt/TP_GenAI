@@ -11,7 +11,7 @@ Asistente interno de un e-commerce ficticio. El TP requiere dos aplicaciones: Ma
 - [Bitácora de Etapa 2](TP_Aplicaciones%20IA%20Generativa_2026/etapa2/criterios.md): decisiones de la extensión.
 - [Instrucciones para IA](AGENTS.md): reglas de trabajo en el repositorio.
 
-`TP_Aplicaciones IA Generativa_2026/etapa1/` contiene la aplicación desarrollada. Los archivos `main.py`, `agentes.py` y `tools.py` de la raíz del TP son el ejemplo original. `Clase 1 - LLMs Intro/` y `Clase 3/` son material auxiliar.
+`TP_Aplicaciones IA Generativa_2026/etapa1/` contiene la aplicación desarrollada. Los ejemplos originales están separados en `TP_Aplicaciones IA Generativa_2026/ejemplos/`, con la interfaz `main_ejemplo.py`. `Clase 1 - LLMs Intro/` y `Clase 3/` son material auxiliar. La raíz del TP ya no contiene un `main.py` de ejemplo.
 
 ## Instalación en Windows / PowerShell
 
@@ -46,6 +46,19 @@ python -m streamlit run main.py
 Abrir la dirección que imprime Streamlit. La interfaz es local, los embeddings y FAISS se ejecutan localmente y el modelo generativo usa Groq. La primera consulta RAG puede descargar el modelo de embeddings. El CSV editorial está en `datos/etapa1/contenidos_aprobados.csv`.
 
 La Etapa 2 aún no tiene aplicación ejecutable.
+
+## Ejecutar los ejemplos originales
+
+Desde la carpeta del TP, con el entorno activo, tanto en Windows como en macOS:
+
+```sh
+cd ejemplos
+python -m streamlit run main_ejemplo.py
+```
+
+Esta interfaz dice **Hornero · Ejemplo básico** y solo dispone de la herramienta de fecha. La aplicación desarrollada dice **Hornero · Etapa 1 · Marketing**. Ambas leen la configuración local del mismo `.env` de la carpeta del TP.
+
+El demo independiente de MCP se ejecuta desde `ejemplos/` con `python ejemplo_mcp.py`; conecta a DeepWiki y consume API de Groq.
 
 ## Verificar funcionamiento
 

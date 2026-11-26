@@ -1,5 +1,5 @@
 """
-tools.py: acá van TODAS las tools que usan los agentes.
+tools_ejemplo.py: herramienta original de referencia para consultar la fecha.
 
 Por ahora hay una sola tool de ejemplo (fecha_de_hoy). Para el TP tienen que sumar
 tools para buscar en documentos (RAG), escribir datos, usar los modelos de machine
@@ -20,7 +20,7 @@ from typing import Literal
 from langchain_core.tools import tool
 
 # Carpeta con los datos del TP (datos/etapa1 y datos/etapa2)
-RUTA_DATOS = Path(__file__).parent / "datos"
+RUTA_DATOS = Path(__file__).resolve().parents[1] / "datos"
 
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",

@@ -8,7 +8,7 @@ El repositorio estaba preparado como prototipo individual: no tenía README, git
 
 Riesgos concretos:
 
-- Los `main.py` duplicados abren dos sistemas diferentes con la misma pantalla.
+- La confusión entre dos `main.py` con la misma pantalla se resolvió separando los ejemplos en `ejemplos/`, renombrando sus módulos y distinguiendo los títulos de ambas interfaces.
 - Los imports `from tools import ...` y `from agentes import ...` dependen de qué carpeta se ejecuta y colisionarían al reutilizar Marketing ingenuamente desde Etapa 2.
 - `agentes.py` concentra esquemas, prompts y grafo. Es tolerable hoy; separar por responsabilidad al extenderlo.
 - El CSV es tanto entrada como salida. No tiene bloqueo ni deduplicación; no sirve como almacenamiento compartido con escritores concurrentes. Usar un clon por persona y consolidar las piezas de entrega conscientemente.
@@ -18,7 +18,7 @@ Riesgos concretos:
 
 ## Organización propuesta
 
-Conservar por ahora la estructura ejecutable y los ejemplos originales. Documentar la entrada correcta resuelve la ambigüedad sin romper material provisto. Mover ejemplos a `ejemplos/` puede hacerse en una tarea separada, ajustando sus rutas de datos.
+Conservar la estructura ejecutable por etapas. Los ejemplos originales se trasladaron a `ejemplos/` y usan nombres explícitos (`main_ejemplo.py`, `agentes_ejemplo.py`, `tools_ejemplo.py`), con rutas de datos y configuración ajustadas. `ejemplo_mcp.py` también vive allí como material de referencia. La implementación se inicia desde `etapa1/`.
 
 ```text
 README.md                       Cómo orientarse, instalar, ejecutar y probar
@@ -31,6 +31,11 @@ TP_Aplicaciones IA Generativa_2026/
   requirements.txt              Dependencias directas
   requirements-lock.txt         Versiones del entorno verificado
   datos/                        Fuentes compartidas y CSV de entrega
+  ejemplos/                     Material original de referencia
+    main_ejemplo.py              Chat del agente básico de fecha
+    agentes_ejemplo.py           Agente original
+    tools_ejemplo.py             Herramienta original
+    ejemplo_mcp.py               Demo independiente de DeepWiki
   etapa1/                       Aplicación Marketing existente
     criterios.md                Bitácora de Marketing
   etapa2/                       Aplicación futura; hoy solo criterios.md

@@ -8,6 +8,7 @@ Fuente única del estado actual. Última revisión: 26/11/2026. Los responsables
 | G-02 | Documentar instalación, arquitectura y trabajo con IA | Hecho | Sin asignar | README, AGENTS, arquitectura y bitácoras |
 | G-03 | Instalar y verificar entorno Windows | Hecho | Sin asignar | Python 3.12.10, 121 paquetes fijados, `pip check` sin conflictos; ver bitácora |
 | G-04 | Acordar responsables, ramas, PR y protección de main | Pendiente | Sin asignar | Flujo propuesto en README; configuración remota no verificada |
+| G-05 | Separar y renombrar ejemplos para evitar ejecutar el agente básico por error | Hecho | Sin asignar | `ejemplos/`; títulos distintos; seis tests y script funcional OK; ver bitácora |
 | E1-01 | Tres roles con StateGraph y una ronda de corrección | Implementado | Sin asignar | `etapa1/agentes.py`; falta evaluación editorial final |
 | E1-02 | RAG persistente y herramientas de historial | Implementado | Sin asignar | `etapa1/rag_guia.py`, `tools.py` |
 | E1-03 | Pruebas técnicas reproducibles, UI y Groq | Hecho | Sin asignar | Seis tests OK; RAG real, AppTest en ambas entradas, Groq real y HTTP 200; ver bitácora |

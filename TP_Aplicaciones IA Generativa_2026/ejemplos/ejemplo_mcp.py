@@ -19,6 +19,7 @@ El script muestra dos formas de usar un server MCP:
 
 import asyncio
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain.agents import create_agent
@@ -26,7 +27,7 @@ from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model="openai/gpt-oss-20b", temperature=0.0,
                max_retries=5, reasoning_effort="low")
