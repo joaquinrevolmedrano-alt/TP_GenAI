@@ -2,7 +2,7 @@
 
 ## Diagnóstico del checkout
 
-La Etapa 1 tiene una separación razonable para el tamaño del TP: `main.py` presenta, `agentes.py` coordina, `tools.py` accede a guía/historial y `rag_guia.py` gestiona recuperación. Mantener carpetas por etapa coincide con el entregable. No hay necesidad actual de microservicios ni de una migración completa a `src/`.
+La Etapa 1 tiene una separación razonable para el tamaño del TP: `main.py` presenta, `agentes.py` coordina, `tools.py` accede a guía/historial, `rag_guia.py` gestiona recuperación y `validaciones.py` comprueba formatos de canal sin LLM. Mantener carpetas por etapa coincide con el entregable. No hay necesidad actual de microservicios ni de una migración completa a `src/`.
 
 El repositorio estaba preparado como prototipo individual: no tenía README, gitignore, guía de contribución, instrucciones para IA, tests versionados ni versiones resueltas de dependencias. La bitácora de Marketing conserva buena evidencia, pero mezcla decisiones históricas y pendientes que luego se resolvieron. Esto dificulta identificar el estado vigente.
 

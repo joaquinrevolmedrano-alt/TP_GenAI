@@ -16,6 +16,7 @@
 - Mantener `responder(pregunta) -> {"respuesta": str, "detalle": list[dict]}` y pasos con `titulo` y `contenido`.
 - Separar interfaz, coordinación, herramientas y acceso a datos. Crear módulos nuevos cuando haya una responsabilidad concreta, sin armar frameworks anticipadamente.
 - Los datos de referencia viven en `datos/`. Las pruebas de escritura usan copias temporales del CSV.
+- En Marketing prima la guía de marca para reglas y beneficios explícitos del segmento. Premium puede comunicar acceso anticipado sin reconfirmarlo por campaña. El pedido aporta detalles particulares; ejemplos, historial y textos de legales no autorizan promociones nuevas. No agregar restricciones que contradigan esa política en un prompt de un rol aislado.
 
 ## Implementación y verificación
 

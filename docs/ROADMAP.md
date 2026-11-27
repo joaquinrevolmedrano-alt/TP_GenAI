@@ -1,6 +1,6 @@
 # Hoja de ruta del TP Hornero
 
-Fuente única del estado actual. Última revisión: 26/11/2026. Los responsables quedan sin asignar hasta acuerdo del equipo. `Implementado` no significa validado editorialmente.
+Fuente única del estado actual. Última revisión: 27/11/2026. Los responsables quedan sin asignar hasta acuerdo del equipo. `Implementado` no significa validado editorialmente.
 
 | ID | Tarea / criterio de cierre | Estado | Responsable | Evidencia o dependencia |
 | --- | --- | --- | --- | --- |
@@ -12,8 +12,11 @@ Fuente única del estado actual. Última revisión: 26/11/2026. Los responsables
 | E1-01 | Tres roles con StateGraph y una ronda de corrección | Implementado | Sin asignar | `etapa1/agentes.py`; falta evaluación editorial final |
 | E1-02 | RAG persistente y herramientas de historial | Implementado | Sin asignar | `etapa1/rag_guia.py`, `tools.py` |
 | E1-03 | Pruebas técnicas reproducibles, UI y Groq | Hecho | Sin asignar | Seis tests OK; RAG real, AppTest en ambas entradas, Groq real y HTTP 200; ver bitácora |
-| E1-04 | Evaluar cuatro consultas oficiales contra guía y pedido | Pendiente | Sin asignar | Bitácora contiene pruebas parciales; no repetir como evaluación técnica |
+| E1-04 | Evaluar cuatro consultas oficiales contra guía y pedido | En curso | Sin asignar | Primera salida de Instagram revisada contra PDF; controles y política de fuentes ajustados; falta revalidar las cuatro consultas con esta versión |
 | E1-05 | Guardar y revisar piezas de entrega | Pendiente | Sin asignar | CSV conserva las ocho filas originales |
+| E1-06 | Validar largos, hashtags y máximos de emojis con Python | Hecho | Sin asignar | `etapa1/validaciones.py`; límites y Unicode verificados; 16 tests totales OK |
+| E1-07 | Consolidar todos los ajustes del revisor antes de corregir | Hecho | Sin asignar | Categorías y reemplazos literales; prueba real del borrador reúne tilde y hashtags; flujo completo OK; no garantiza exhaustividad editorial |
+| E1-08 | Unificar las fuentes con prioridad de la guía de marca | Hecho | Sin asignar | Decisión del usuario: prima la guía; política compartida por los tres roles; acceso anticipado aceptado y descuento inventado rechazado en pruebas reales |
 | E2-01 | Acordar orquestador, contratos y reutilización de Marketing | Propuesto | Sin asignar | `docs/ARQUITECTURA.md`; resolver imports sin duplicar código |
 | E2-02 | RAG de políticas RRHH | Pendiente | Sin asignar | Manual provisto |
 | E2-03 | Entrenar/validar attrition y tools de predicción, interpretación y simulación | Pendiente | Sin asignar | `empleados.csv`; definir partición y métrica |

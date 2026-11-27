@@ -15,6 +15,11 @@ import tools
 from streamlit.testing.v1 import AppTest
 
 
+def revision_editorial(**errores):
+    campos = dict(ortografia=[], tono=[], respaldo=[], repeticion=[], contenido=[], datos_faltantes=[])
+    return agentes.RevisionEditorial(**{**campos, **errores})
+
+
 class FlujoTest(unittest.TestCase):
     def setUp(self):
         self.temporal = tempfile.TemporaryDirectory()
@@ -38,8 +43,14 @@ class FlujoTest(unittest.TestCase):
                 return agentes.Pedido(canal="Instagram", segmento="Premium",
                                       promocion="ninguna", guardar=guardar, es_marketing=True)
             if esquema is agentes.Pieza:
-                return agentes.Pieza(titulo="Pieza de prueba", texto="Conocé la nueva colección.")
-            return agentes.Revision(veredicto=next(revisiones), observacion="Revisión de prueba")
+                return agentes.Pieza(titulo="Pieza de prueba",
+                                     texto="Conocé la colección. #HorneroEnCasa #Exterior #Colección")
+            veredicto = next(revisiones)
+            if veredicto == "corregir":
+                return revision_editorial(tono=[agentes.AjusteTexto(fragmento="Conocé", reemplazo="Descubrí")])
+            if veredicto == "pedir_datos":
+                return revision_editorial(datos_faltantes=["¿Qué dato comercial está autorizado?"])
+            return revision_editorial()
 
         brief = {"pedido": "Pedido de prueba", "reglas_aplicables": {}, "historial": [],
                  "estrategia": {"objetivo": "Comunicar", "enfoque": "Colección",
@@ -71,7 +82,7 @@ class FlujoTest(unittest.TestCase):
 
     def test_segunda_correccion_termina_sin_escribir(self):
         resultado, llamadas = self.ejecutar(["corregir", "corregir"])
-        self.assertEqual(llamadas.count(agentes.Revision), 2)
+        self.assertEqual(llamadas.count(agentes.RevisionEditorial), 2)
         self.assertIn("pendiente", resultado["respuesta"])
         self.assertEqual(self.original, self.historial.read_bytes())
 
@@ -90,6 +101,51 @@ class FlujoTest(unittest.TestCase):
         self.assertEqual(consulta.call_count, 1)
         self.assertIn("[enlace oficial]", resultado["respuesta"])
         self.assertEqual(self.original, self.historial.read_bytes())
+
+    def test_revision_reune_formato_y_ortografia_desde_primera_pasada(self):
+        estado = {
+            "pregunta": "Post de Instagram", "pedido": agentes.Pedido(
+                canal="Instagram", segmento="Premium", promocion="ninguna", guardar=False, es_marketing=True),
+            "brief": {"pedido": "Post de Instagram", "reglas_aplicables": {}, "historial": []},
+            "pieza": agentes.Pieza(titulo="Colección", texto="Elegi " + "x" * 2200 + " 🌿✨🏡🌞"),
+        }
+        with patch.object(agentes, "_consultar", return_value=revision_editorial(
+                ortografia=[agentes.AjusteTexto(fragmento="Elegi", reemplazo="Elegí")])):
+            revision = agentes._revisor(estado)["revision"]
+        self.assertEqual(revision.veredicto, "corregir")
+        for hallazgo in ("2200", "hashtags", "#HorneroEnCasa", "emojis", "Elegí"):
+            self.assertIn(hallazgo, revision.observacion)
+
+    def test_datos_faltantes_conservan_otros_hallazgos(self):
+        estado = {
+            "pregunta": "Post de Instagram", "pedido": agentes.Pedido(
+                canal="Instagram", segmento="Premium", promocion="ninguna", guardar=True, es_marketing=True),
+            "brief": {"pedido": "Post de Instagram", "reglas_aplicables": {}, "historial": []},
+            "pieza": agentes.Pieza(titulo="Colección", texto="Elegi la colección."),
+        }
+        with patch.object(agentes, "_consultar", return_value=revision_editorial(
+                ortografia=[agentes.AjusteTexto(fragmento="Elegi", reemplazo="Elegí")],
+                datos_faltantes=["¿Cuál es la vigencia?"])):
+            revision = agentes._revisor(estado)["revision"]
+        self.assertEqual(revision.veredicto, "pedir_datos")
+        self.assertIn("hashtags", revision.observacion)
+        self.assertIn("Elegí", revision.observacion)
+        self.assertIn("vigencia", revision.observacion)
+
+    def test_revision_descarta_cambios_identicos_y_no_duplica_correcciones(self):
+        estado = {
+            "pregunta": "Post de Instagram", "pedido": agentes.Pedido(
+                canal="Instagram", segmento="Premium", promocion="ninguna", guardar=False, es_marketing=True),
+            "brief": {"pedido": "Post de Instagram", "reglas_aplicables": {}, "historial": []},
+            "pieza": agentes.Pieza(titulo="Colección", texto="Elegi. Abrí la app. #HorneroEnCasa #Exterior #Colección"),
+        }
+        ajuste = agentes.AjusteTexto(fragmento="Elegi", reemplazo="Elegí")
+        with patch.object(agentes, "_consultar", return_value=revision_editorial(
+                ortografia=[ajuste], tono=[ajuste, agentes.AjusteTexto(fragmento="Abrí", reemplazo="Abrí")])):
+            revision = agentes._revisor(estado)["revision"]
+        self.assertEqual(revision.veredicto, "corregir")
+        self.assertEqual(revision.observacion.count("Reemplazá"), 1)
+        self.assertNotIn("Tono:", revision.observacion)
 
     def test_app_muestra_respuesta_y_detalle(self):
         respuesta = {"respuesta": "Respuesta técnica de prueba", "detalle": [
