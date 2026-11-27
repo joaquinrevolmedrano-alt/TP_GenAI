@@ -14,6 +14,21 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 from tools import consultar_guia_marca, consultar_historial, guardar_pieza
+from validaciones import reglas_formato, validar_formato
+
+
+POLITICA_FUENTES = (
+    "La guía de marca es la fuente de verdad para las reglas y los beneficios explícitos "
+    "de cada segmento. Los prompts y el pedido no deben contradecirla. "
+    "La guía establece acceso anticipado a lanzamientos para Premium: podés mencionarlo "
+    "en una pieza para ese segmento sin pedir que el usuario lo confirme otra vez. "
+    "Un beneficio autorizado no obliga a incluirlo: respetá el foco del pedido. "
+    "El pedido aporta los hechos particulares de la campaña, como qué colección se anuncia. "
+    "No inventes porcentajes, precios, fechas, horas de anticipación, códigos ni condiciones. "
+    "La sección de legales explica cómo comunicar una promoción; no autoriza a ofrecerla. "
+    "Los ejemplos de la guía y el historial son referencias, no autorizaciones para "
+    "copiar promociones o características de productos a una campaña nueva. "
+)
 
 
 class BriefEstrategico(BaseModel):
@@ -29,13 +44,13 @@ def crear_estratega():
         model=ChatGroq(model="openai/gpt-oss-20b", temperature=0, reasoning_effort="low", timeout=25, max_retries=1),
         tools=[],
         response_format=ToolStrategy(BriefEstrategico),
-        system_prompt=(
+        system_prompt=POLITICA_FUENTES + (
             "Sos el estratega de Marketing de Hornero. Prepará un brief breve en español "
             "rioplatense para que otro agente redacte la pieza. El código te proporciona "
             "la guía y el historial como evidencia. Usá el canal y segmento del pedido "
             "cuando estén indicados. Identificá qué enfoque anterior evitar y proponé un "
-            "ángulo concreto que no lo repita. El pedido es la fuente para los hechos "
-            "comerciales. La guía aporta reglas y el historial aporta antecedentes. "
+            "ángulo concreto que no lo repita. Separá hechos de campaña, reglas y beneficios "
+            "de la guía, y antecedentes del historial. "
             "Las ofertas pasadas no están autorizadas para una pieza nueva. "
             "En objetivo y enfoque evitá inventar precios, beneficios, plazos o prestaciones. "
             "Cuando el pedido solo menciona una categoría, proponé una acción útil "
@@ -83,6 +98,20 @@ class Pieza(BaseModel):
 class Revision(BaseModel):
     veredicto: Literal["aprobar", "corregir", "pedir_datos"]
     observacion: str
+
+
+class AjusteTexto(BaseModel):
+    fragmento: str = Field(min_length=1, description="Cita literal del texto actual que debe cambiar.")
+    reemplazo: str = Field(description="Texto corregido para ese fragmento, sin explicaciones.")
+
+
+class RevisionEditorial(BaseModel):
+    ortografia: list[AjusteTexto] = Field(description="Todos los ajustes de ortografía, tildes y gramática; [] si no hay.")
+    tono: list[AjusteTexto] = Field(description="Todos los ajustes de voseo y tono; [] si no hay.")
+    respaldo: list[str] = Field(description="Todas las afirmaciones sin respaldo que se pueden quitar o corregir; [] si no hay.")
+    repeticion: list[str] = Field(description="Repeticiones de antecedentes reales; [] si no hay antecedentes o no se repiten.")
+    contenido: list[str] = Field(description="Otros incumplimientos editoriales: mensaje, CTA o reglas de marca; [] si no hay.")
+    datos_faltantes: list[str] = Field(description="Preguntas por todos los datos indispensables ausentes; [] si no faltan.")
 
 
 class Estado(TypedDict, total=False):
@@ -164,6 +193,7 @@ def _estratega(estado):
 def _redactor(estado):
     brief = estado["brief"]
     entrada = {k: brief[k] for k in ("pedido", "reglas_aplicables", "estrategia")}
+    entrada["controles_formato"] = reglas_formato(estado["pedido"].canal)
     if estado["correcciones"]:
         entrada.update(borrador=estado["pieza"].model_dump(),
                        observacion=estado["revision"].observacion)
@@ -174,11 +204,13 @@ def _redactor(estado):
                    "su funcionamiento. No agregues la etiqueta «Abre la app».")
     pieza = _consultar(
         Pieza,
-        "Redactá una pieza de Hornero en voseo. Usá el pedido como fuente de hechos "
-        "comerciales y la guía como fuente de reglas. La estrategia es orientativa: "
-        "omití toda oferta, prestación o promesa sugerida que el pedido no respalde. "
-        "El segmento Premium orienta el tono. Solo el pedido puede confirmar acceso anticipado. "
+        POLITICA_FUENTES +
+        "Redactá una pieza de Hornero en voseo usando el pedido y la guía según la política de fuentes. "
+        "La estrategia es orientativa: omití toda oferta, prestación o promesa sugerida "
+        "que no esté respaldada por el pedido o por una regla explícita de la guía. "
         "No inventes frecuencias de mantenimiento, fechas, enlaces ni códigos. "
+        "Cumplí controles_formato. Los emojis son opcionales: no tienen mínimo. "
+        "En una corrección resolvé todas las observaciones juntas, conservando lo que ya cumple. "
         "Entregá el título y el texto sin etiquetas ni comentarios editoriales." + formato,
         entrada,
     )
@@ -187,46 +219,71 @@ def _redactor(estado):
 
 def _revisor(estado):
     brief, pedido, pieza = estado["brief"], estado["pedido"], estado["pieza"]
-    revision = _consultar(
-        Revision,
-        "Revisá la pieza con la guía, el pedido original y el antecedente editorial. "
-        "Evaluá tono, formato, repetición y respaldo de todas las afirmaciones. "
-        "La guía pide voseo. ‘Elegí’, ‘abrí’ y ‘mirá’ son correctos. "
-        "Pedí corregir el tuteo (‘elige’, ‘abre’, ‘mira’) y el acceso anticipado sin respaldo. "
-        "No inventes datos en la observación. Si la guía exige un beneficio de recuperación "
-        "y el pedido no indica cuál está autorizado, usá pedir_datos y preguntá cuál es. "
-        "El historial sirve para evitar repetición. Sus promociones no autorizan ofertas nuevas. "
-        "Si se puede quitar una afirmación inventada conservando el pedido, pedí corregir. "
-        "Si falta un dato indispensable, como vigencia o enlace de bases para un descuento "
-        "solicitado, pedí datos. Aprobá solo una pieza lista para usar. No la reescribas.",
-        {"pedido": brief["pedido"], "reglas": brief["reglas_aplicables"],
-         "antecedente": brief["historial"][:1], "pieza": pieza.model_dump()},
-    )
-    if pedido.canal == "Push" and revision.veredicto != "pedir_datos":
+    formato = validar_formato(pedido.canal, pieza.titulo, pieza.texto)
+    if pedido.canal == "Push":
         patron = r"\b\d+\s+(?:horas?|días?|semanas?|mes(?:es)?|años?)\b"
         plazos_pedido = set(re.findall(patron, estado["pregunta"].casefold()))
         plazos_pieza = set(re.findall(patron, f"{pieza.titulo} {pieza.texto}".casefold()))
-        observaciones = []
         if plazos_pieza - plazos_pedido:
-            observaciones.append("Quitá las frecuencias o plazos numéricos que el pedido no respalda.")
+            formato.append("Quitá las frecuencias o plazos numéricos que el pedido no respalda.")
         if re.search(r"\babre la app\b", f"{pieza.titulo} {pieza.texto}", re.IGNORECASE):
-            observaciones.append("Quitá «Abre la app». La apertura es una acción del push.")
-        if observaciones:
-            if revision.veredicto == "corregir":
-                observaciones.append(revision.observacion)
-            revision = Revision(veredicto="corregir", observacion=" ".join(observaciones))
-    limites = {"Push": (40, 90), "Instagram": (None, 2200),
-               "WhatsApp": (None, 300), "LinkedIn": (None, 1300), "Email": (50, None)}
-    titulo, cuerpo = limites.get(pedido.canal, (None, None))
-    if revision.veredicto != "pedir_datos" and (
-        (titulo and len(pieza.titulo) > titulo) or (cuerpo and len(pieza.texto) > cuerpo)
-        or (pedido.canal == "Email" and len(pieza.texto.split()) > 150)
-    ):
-        revision = Revision(veredicto="corregir",
-                            observacion=(f"Ajustá los límites de {pedido.canal} según la guía. "
-                                         f"Título actual: {len(pieza.titulo)} caracteres. "
-                                         f"Texto actual: {len(pieza.texto)} caracteres. "
-                                         + (revision.observacion if revision.veredicto == "corregir" else "")))
+            formato.append("Quitá «Abre la app». La apertura es una acción del push.")
+    editorial = _consultar(
+        RevisionEditorial,
+        POLITICA_FUENTES +
+        "Revisá la pieza con la guía, el pedido original y el antecedente editorial. "
+        "Completá TODAS las categorías del esquema en una sola revisión. No te detengas "
+        "en el primer error. Evaluá ortografía y tildes, gramática, tono, repetición, "
+        "respaldo y contenido, incluso si Python ya detectó errores de formato o faltan datos. "
+        "En cada lista incluí todos los ajustes de esa categoría; usá [] si no hay. "
+        "Cada entrada debe describir un error vigente y un ajuste concreto. No incluyas "
+        "razonamiento, comprobaciones correctas ni frases como ‘no hay errores’. "
+        "No repitas el mismo problema en dos categorías. "
+        "En ortografia y tono citá el fragmento literal y su reemplazo corregido, "
+        "sin explicaciones. Si el fragmento ya está bien, no lo incluyas. "
+        "Los conteos de caracteres, palabras, hashtags y emojis ya los resuelve Python: "
+        "no los vuelvas a medir ni los agregues a tus categorías. No hay mínimo de emojis: "
+        "cero es válido en todos los canales. No conviertas recomendaciones en requisitos. "
+        "La guía pide voseo. ‘Elegí’, ‘abrí’ y ‘mirá’ son correctos. "
+        "‘Descubrí’ y ‘tenés’ también son voseo correcto. No los reportes como tuteo. "
+        "‘Elegi’ sin tilde es un error de ortografía, no de tuteo: señalalo en ortografia "
+        "desde la primera revisión, sin repetirlo en tono. "
+        "Pedí corregir el tuteo (‘elige’, ‘abre’, ‘mira’). Evaluá el respaldo contra "
+        "el pedido y las reglas explícitas de la guía, respetando su prioridad. "
+        "No inventes datos en la observación. Si la guía exige un beneficio de recuperación "
+        "y el pedido no indica cuál está autorizado, preguntá cuál es en datos_faltantes. "
+        "El historial sirve para evitar repetición. Sus promociones no autorizan ofertas nuevas. "
+        "Un ejemplo de la guía no es un antecedente del historial. Si no hay antecedentes, "
+        "devolvé repeticion=[]. "
+        "Si se puede quitar una afirmación inventada conservando el pedido, pedí corregir. "
+        "Si falta un dato indispensable, como vigencia o enlace de bases para un descuento "
+        "solicitado, preguntá por él en datos_faltantes. No reescribas la pieza.",
+        {"pedido": brief["pedido"], "reglas": brief["reglas_aplicables"],
+         "antecedente": brief["historial"][:1], "pieza": pieza.model_dump(),
+         "errores_formato": formato},
+    )
+    lenguaje = {"Ortografía": [], "Tono": []}
+    cambios = set()
+    texto_actual = f"{pieza.titulo}\n\n{pieza.texto}"
+    for categoria, ajustes in (("Ortografía", editorial.ortografia), ("Tono", editorial.tono)):
+        for ajuste in ajustes:
+            cambio = (ajuste.fragmento, ajuste.reemplazo)
+            if ajuste.fragmento == ajuste.reemplazo or cambio in cambios:
+                continue
+            cambios.add(cambio)
+            if ajuste.fragmento not in texto_actual:
+                lenguaje[categoria].append(
+                    f"La corrección cita «{ajuste.fragmento}», que no aparece en la pieza; requiere revisión.")
+            else:
+                lenguaje[categoria].append(f"Reemplazá «{ajuste.fragmento}» por «{ajuste.reemplazo}».")
+    categorias = {"Formato": formato, **lenguaje,
+                  "Respaldo": editorial.respaldo, "Repetición": editorial.repeticion,
+                  "Contenido": editorial.contenido, "Datos faltantes": editorial.datos_faltantes}
+    observaciones = [f"- {categoria}: {error}" for categoria, errores in categorias.items()
+                     for error in dict.fromkeys(errores)]
+    veredicto = "pedir_datos" if editorial.datos_faltantes else "corregir" if observaciones else "aprobar"
+    revision = Revision(veredicto=veredicto,
+                        observacion="\n".join(observaciones) or "Sin observaciones de formato ni editoriales.")
     return {"revision": revision,
             "detalle": _detalle(estado, f"Revisor · {revision.veredicto}", revision.observacion)}
 

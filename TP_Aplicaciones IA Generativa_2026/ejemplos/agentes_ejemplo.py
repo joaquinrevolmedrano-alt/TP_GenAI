@@ -1,22 +1,23 @@
 """
-agentes.py: acá se definen los agentes y cómo se conectan entre sí.
+agentes_ejemplo.py: agente original de referencia, con una tool de fecha.
 
 Por ahora hay un único agente muy simple, con un system prompt trivial y una sola
 tool. Para el TP lo tienen que reemplazar por el sistema multiagente que diseñen.
 
-main.py solo usa la función responder(): mientras respeten lo que devuelve,
+main_ejemplo.py solo usa la función responder(): mientras respeten lo que devuelve,
 pueden cambiar todo lo que hay detrás sin tocar la app de Streamlit.
 """
 
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 
-from tools import fecha_de_hoy
+from tools_ejemplo import fecha_de_hoy
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 MODELO = "openai/gpt-oss-20b"
 # reasoning_effort="low": con el valor por defecto, gpt-oss-20b a veces razona hasta agotar los
@@ -51,7 +52,7 @@ def mostrar_pasos(resultado) -> list:
 
 
 def pasos_para_la_app(resultado) -> list[dict]:
-    # Igual que mostrar_pasos, pero devuelve los pasos en el formato que muestra main.py
+    # Igual que mostrar_pasos, pero devuelve los pasos para main_ejemplo.py
     return [{"titulo": f"Tool llamada: {tc['name']}", "contenido": str(tc["args"])}
             for msg in resultado["messages"] for tc in (getattr(msg, "tool_calls", None) or [])]
 
@@ -68,7 +69,7 @@ agente_simple = create_agent(
 
 
 def responder(pregunta: str) -> dict:
-    """Punto de entrada que usa main.py.
+    """Punto de entrada que usa main_ejemplo.py.
 
     Devuelve un diccionario con:
       - "respuesta": el texto final que se muestra en el chat.

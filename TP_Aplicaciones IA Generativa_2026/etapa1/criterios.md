@@ -115,3 +115,49 @@ El push aprobado incluyó «cada 15 días» y «Abre la app». El WhatsApp qued�
 ## Borrador visible cuando falta el enlace de WhatsApp
 
 En una prueba manual, el chat mostró solo el veredicto y dejó en el detalle un borrador con fechas y URL ficticias. El caso WhatsApp con descuento sin enlace ahora muestra en el mensaje principal una plantilla pendiente de aprobación con un marcador de enlace. Python reutiliza el porcentaje y las categorías reconocidas cuando aparecen explícitamente. AppTest verificó el pedido del 15 % en Cocina con clasificación simulada, sin escritura en el CSV.
+
+## 26/11/2026 · Evaluación manual de Instagram Premium · E1-04
+
+Fuente: salida y detalle compartidos por el usuario desde la aplicación de Etapa 1; no es una nueva ejecución ni una prueba simulada. Pedido: anunciar la nueva colección de muebles de exterior para Premium en Instagram.
+
+El recorrido observado fue estratega, redactor, revisión con corrección, redactor y segunda revisión con corrección. Terminó pendiente al agotarse la única ronda permitida, de acuerdo con el diseño. La primera versión no tenía hashtags y ambas versiones escribieron «Elegi» sin tilde. El revisor pidió los hashtags en la primera revisión, pero detectó la tilde recién en la segunda. Se desperdició la oportunidad de corregir todos los errores juntos.
+
+La exigencia de agregar emojis fue un falso requisito: la tabla de Instagram dice «hasta 3» y las reglas de voz fijan un máximo, no un mínimo. Sí corresponde exigir de tres a cinco hashtags e incluir `#HorneroEnCasa`. La segunda versión cumplía esos conteos, pero conservó la falta de tilde.
+
+Hay una inconsistencia de fuentes que requiere decisión: la sección 7 de la guía menciona acceso anticipado para Premium y la sección 9 lo usa en un ejemplo; en cambio, los prompts de redactor y revisor exigen respaldo en el pedido para esa afirmación. El estratega la propuso y el revisor afirmó que no había datos sin respaldo. Hay que acordar si esas reglas de segmento autorizan un beneficio permanente o si cada campaña debe confirmarlo y aplicar el mismo criterio en los tres roles.
+
+El estratega colocó el ejemplo negativo de la guía en `antecedentes_a_evitar`. Eso no es una pieza histórica. La consulta al CSV actual con los mismos filtros de canal Instagram y segmento Premium/Todos no devuelve filas; ese caso debe representar explícitamente ausencia de antecedentes, sin transformar ejemplos de la guía en historial.
+
+Próximo trabajo: alinear política de fuentes; separar controles objetivos de formato y revisión semántica; recoger todas las observaciones en la primera revisión y evaluar de nuevo. No se modificaron prompts ni se relajó el límite de correcciones en esta evaluación. E1-04 sigue en curso.
+
+## 26/11/2026 · Controles de formato y revisión conjunta · E1-06, E1-07
+
+El usuario autorizó implementar controles objetivos y consolidar las observaciones. La decisión sobre beneficios de segmento se mantiene pendiente en E1-08: puede tratarse el acceso anticipado como derecho permanente de Premium o como beneficio que se confirma por lanzamiento. No se cambió automáticamente esa política.
+
+`validaciones.py` centraliza los límites de la sección 4 de la guía para Instagram, Email, WhatsApp, Push y LinkedIn. Controla largos, palabras del email, cantidad de hashtags, `#HorneroEnCasa` y máximos de emojis. Cero emojis es válido. Para Instagram, WhatsApp y LinkedIn cuenta título y cuerpo publicados; para Push y Email aplica límites separados. Los caracteres se cuentan en Unicode NFC con `len`; los emojis por secuencias visibles, sin contar por separado tonos de piel, banderas o familias. `regex` se declara como dependencia directa; ya estaba instalado y fijado en el lock. Si cambia la guía, revisar también esta tabla de reglas.
+
+El redactor recibe la misma configuración que usa Python. El revisor devuelve todas las categorías en una respuesta estructurada: ortografía, tono, respaldo, repetición, contenido y datos faltantes. Python reúne esa respuesta con los hallazgos objetivos y calcula el veredicto. Un dato faltante conserva los otros hallazgos y termina pendiente. Se mantiene una ronda de corrección y el guardado exclusivo de piezas aprobadas a pedido del usuario.
+
+Las primeras pruebas reales detectaron la tilde y los hashtags juntos, pero el modelo produjo explicaciones contradictorias en tono. Por eso ortografía y tono ahora requieren citas literales con reemplazo concreto. Se eliminan cambios idénticos y duplicados; una cita que no aparece en la pieza se marca para revisión. Los demás juicios editoriales siguen dependiendo del modelo: la estructura no garantiza detectar todos los errores.
+
+Alternativa descartada: aumentar rondas para compensar revisiones parciales.
+
+Validación final: `python -m unittest discover -s tests -v` pasó 16/16 y `pip check` no detectó conflictos. En una revisión real del primer borrador del usuario, Groq devolvió juntos los dos hallazgos de hashtags y el reemplazo «Elegi» por «Elegí», sin exigir emojis ni agregar observaciones de tono. `python scripts/verificar_funcionamiento.py --live` comprobó ambas interfaces, RAG, CSV temporal y el grafo con el nuevo esquema editorial (cinco pasos de detalle, 5,4 s del bloque de grafo). CSV original intacto. Pruebas ejecutadas en Windows; el código no usa rutas ni lógica específicas del sistema operativo. Los cambios quedan locales, sin commit/push en esta tarea. E1-04 y la política de negocio E1-08 siguen pendientes de cierre.
+
+## 26/11/2026 · Prioridad de la guía de marca · E1-08
+
+Decisión del usuario: debe primar la guía. La sección 7 declara el acceso anticipado como beneficio de Premium; no exige confirmarlo por lanzamiento. La condición de reconfirmación había sido agregada en prompts y se retiró. Las entradas anteriores conservan la discusión previa; esta decisión la resuelve.
+
+Se agregó `POLITICA_FUENTES` compartida por estratega, redactor y revisor: la guía determina reglas y beneficios explícitos del segmento; el pedido determina los detalles de la campaña. Un beneficio permitido no obliga a incluirlo. Ejemplos, historial y textos de legales no autorizan promociones nuevas. El acceso anticipado no permite inventar cuántas horas o días de ventaja hay, porcentajes, códigos ni fechas. La misma política queda indicada en AGENTS para evitar que futuros cambios la contradigan.
+
+Validación: 16/16 tests técnicos OK. En dos consultas reales al revisor, una pieza Premium con «la ves antes que nadie» fue aprobada y otra que agregaba 10 % de descuento y código PREMIUM10 fue marcada para corregir por falta de respaldo. Ambas usaron la guía recuperada y el pedido original, sin guardar piezas. E1-08 se cierra; E1-04 requiere repetir las cuatro consultas oficiales con la versión actual.
+
+La verificación completa `python scripts/verificar_funcionamiento.py --live` también pasó con la política compartida: ambas interfaces, RAG y persistencia temporal OK; estratega, redactor y revisor completaron tres pasos de detalle en 5,2 s del bloque de grafo. CSV original intacto.
+
+## 27/11/2026 · Reinicio para pruebas manuales · E1-03, E1-04
+
+Al reiniciar la app se observó que el navegador conectaba y mostraba «Stop», pero no llegaba a renderizar el título mientras se importaban dependencias de IA. `main.py` importaba `agentes` antes de mostrar la interfaz. Se movió ese import al bloque de la primera consulta, dentro del indicador «Pensando...», para mostrar el título y el chat sin esperar esa carga. No cambia la lógica de agentes ni los datos.
+
+Tras reiniciar de nuevo, Chromium confirmó título de Marketing y entrada de chat visibles en `127.0.0.1:8502`. Se abrió la aplicación en el navegador del usuario para repetir las cuatro consultas oficiales. Esta comprobación de arranque no invocó Groq ni modificó el CSV.
+
+Regresión del cambio de arranque: `python -m unittest discover -s tests -p test_funcionamiento.py -v` pasó 9/9, incluida la interacción con el chat y la presentación de respuesta y detalle con el agente simulado.

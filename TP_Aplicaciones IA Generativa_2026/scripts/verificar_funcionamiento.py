@@ -21,22 +21,26 @@ def verificar(live=False):
         importlib.import_module(nombre)
     print("OK: imports de dependencias", flush=True)
 
-    # Cada interfaz en su proceso: evita mezclar los módulos homónimos de ambas carpetas.
-    for carpeta in (BASE, BASE / "etapa1"):
+    # Cada interfaz en su proceso, con una entrada y un título explícitos.
+    for carpeta, archivo, titulo in (
+        (BASE / "ejemplos", "main_ejemplo.py", "Ejemplo básico"),
+        (BASE / "etapa1", "main.py", "Etapa 1 · Marketing"),
+    ):
         codigo = (
-            "from streamlit.testing.v1 import AppTest; "
-            "a = AppTest.from_file('main.py', default_timeout=60).run(); "
+            "import sys; from streamlit.testing.v1 import AppTest; "
+            "a = AppTest.from_file(sys.argv[1], default_timeout=60).run(); "
             "assert not len(a.exception), str(a.exception); "
+            "assert sys.argv[2] in a.title[0].value; "
             "assert len(a.chat_input) == 1; print('OK: interfaz inicial')"
         )
-        resultado = subprocess.run([sys.executable, "-c", codigo], cwd=carpeta,
+        resultado = subprocess.run([sys.executable, "-c", codigo, archivo, titulo], cwd=carpeta,
                                    capture_output=True, text=True, encoding="utf-8",
                                    env={**os.environ, "PYTHONIOENCODING": "utf-8",
                                         "GROQ_API_KEY": "functional-test-no-api-call"}, timeout=120)
         if resultado.returncode:
             # No volcar trazas que puedan contener argumentos con credenciales.
             raise RuntimeError(f"La interfaz de {carpeta.name} falló; revisar con AppTest local")
-        print(f"OK: arranque de {carpeta.relative_to(BASE)}/main.py", flush=True)
+        print(f"OK: arranque de {carpeta.relative_to(BASE)}/{archivo}", flush=True)
 
     import agentes
     import tools

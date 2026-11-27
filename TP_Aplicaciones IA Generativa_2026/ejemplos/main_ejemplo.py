@@ -1,17 +1,17 @@
 """
-main.py: aplicación de Streamlit para probar los agentes.
+main_ejemplo.py: aplicación original de ejemplo, con una tool de fecha.
 
 Cómo correrla (desde esta carpeta, con el venv activado):
-    streamlit run main.py
+    streamlit run main_ejemplo.py
 """
 
 import streamlit as st
 
-from agentes import responder
+from agentes_ejemplo import responder
 
-st.set_page_config(page_title="Asistente Hornero", page_icon="🏠")
-st.title("🏠 Asistente Hornero")
-st.caption("TP Aplicaciones de IA Generativa: sistema multiagente")
+st.set_page_config(page_title="Hornero · Ejemplo básico", page_icon="📚")
+st.title("📚 Hornero · Ejemplo básico")
+st.caption("Material de referencia: agente con fecha_de_hoy. Para Marketing, ejecutá etapa1/main.py.")
 
 if "historial" not in st.session_state:
     st.session_state.historial = []

@@ -10,18 +10,20 @@
 ## Arquitectura y alcance
 
 - La implementación de Marketing vive en `TP_Aplicaciones IA Generativa_2026/etapa1/`.
-- Los tres Python de la raíz del TP son el ejemplo original, no el flujo de Marketing.
+- Los ejemplos originales viven en `TP_Aplicaciones IA Generativa_2026/ejemplos/`; su interfaz es `main_ejemplo.py` y sus módulos son `agentes_ejemplo.py` y `tools_ejemplo.py`.
 - `etapa2/` contiene por ahora documentación de diseño, no una aplicación terminada.
 - Conservar las aplicaciones independientes `etapa1/main.py` y `etapa2/main.py` que exige la consigna.
 - Mantener `responder(pregunta) -> {"respuesta": str, "detalle": list[dict]}` y pasos con `titulo` y `contenido`.
 - Separar interfaz, coordinación, herramientas y acceso a datos. Crear módulos nuevos cuando haya una responsabilidad concreta, sin armar frameworks anticipadamente.
 - Los datos de referencia viven en `datos/`. Las pruebas de escritura usan copias temporales del CSV.
+- En Marketing prima la guía de marca para reglas y beneficios explícitos del segmento. Premium puede comunicar acceso anticipado sin reconfirmarlo por campaña. El pedido aporta detalles particulares; ejemplos, historial y textos de legales no autorizan promociones nuevas. No agregar restricciones que contradigan esa política en un prompt de un rol aislado.
 
 ## Implementación y verificación
 
 - No leer ni imprimir secretos de `.env`. Usar variables de entorno y compartir solo `.env.example`.
 - Usar UTF-8 explícito al leer/escribir texto; rutas basadas en `Path(__file__)` para datos.
-- No usar `ejemplo_mcp.py` como prueba de imports: ejecuta conexiones y llamadas externas al importarse.
+- No usar `ejemplos/ejemplo_mcp.py` como prueba de imports: ejecuta conexiones y llamadas externas al importarse.
+- Mantener compatibles con Windows y macOS los cambios de código; documentar comandos y dependencias específicos de cada plataforma por separado.
 - Ejecutar `python -m unittest discover -s tests -v` desde la carpeta del TP para cambios del flujo.
 - Ejecutar `python scripts/verificar_funcionamiento.py` para verificar dependencias, RAG y ambas interfaces. `--live` agrega una consulta real a Groq; tiene consumo de API.
 - Una respuesta de error del proveedor no cuenta como integración exitosa. Distinguir pruebas simuladas, pruebas reales y evaluación editorial.

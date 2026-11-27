@@ -4,6 +4,7 @@
 python-dotenv
 pandas
 numpy
+regex  # Conteo Unicode de secuencias emoji, compatible con Windows y macOS
 
 # LLM y agentes
 groq

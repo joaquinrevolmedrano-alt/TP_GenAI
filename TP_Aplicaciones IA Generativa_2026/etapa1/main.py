@@ -7,11 +7,9 @@ Cómo correrla (desde esta carpeta, con el venv activado):
 
 import streamlit as st
 
-from agentes import responder
-
-st.set_page_config(page_title="Asistente Hornero", page_icon="🏠")
-st.title("🏠 Asistente Hornero")
-st.caption("TP Aplicaciones de IA Generativa: sistema multiagente")
+st.set_page_config(page_title="Hornero · Etapa 1 · Marketing", page_icon="🏠")
+st.title("🏠 Hornero · Etapa 1 · Marketing")
+st.caption("Flujo de Marketing: estratega → redactor → revisor")
 
 if "historial" not in st.session_state:
     st.session_state.historial = []
@@ -40,6 +38,9 @@ if pregunta := st.chat_input("Escribí tu consulta..."):
 
     with st.chat_message("assistant"):
         with st.spinner("Pensando..."):
+            # Cargar dependencias de IA al consultar, con la interfaz ya visible.
+            from agentes import responder
+
             resultado = responder(pregunta)
         st.markdown(resultado["respuesta"])
         mostrar_detalle(resultado.get("detalle", []))

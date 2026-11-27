@@ -33,6 +33,15 @@ Alcance: funcionamiento técnico, sin evaluación editorial. Los tiempos son obs
 
 Referencias: [entornos virtuales de Python](https://docs.python.org/3/library/venv.html) y [reglas de gitignore](https://git-scm.com/docs/gitignore). Los entornos se recrean localmente; ignorar un archivo no elimina archivos ya versionados. En este checkout `.env` aún no estaba versionado.
 
+## 26/11/2026 · Separación de ejemplos · G-05
+
+- La prueba manual se había hecho sobre el agente básico de fecha por la duplicación de nombres e interfaces. Se trasladaron los cuatro scripts originales a `TP_Aplicaciones IA Generativa_2026/ejemplos/`.
+- La interfaz original ahora es `main_ejemplo.py`, con módulos `agentes_ejemplo.py` y `tools_ejemplo.py`. El demo `ejemplo_mcp.py` también se movió. Se ajustaron imports y rutas a `datos/` y `.env` con `pathlib`, sin duplicar configuración ni agregar rutas específicas de Windows.
+- Las pantallas ahora se identifican como «Hornero · Ejemplo básico» y «Hornero · Etapa 1 · Marketing». Alternativa descartada: mantener el ejemplo como `main.py` en la raíz, que ya había causado confusión.
+- README, AGENTS, arquitectura y script de verificación reflejan las nuevas ubicaciones. Las entradas anteriores de esta bitácora conservan las rutas que existían cuando se hicieron aquellas pruebas.
+- Verificación: `python -m unittest discover -s tests -v` pasó 6/6; `python scripts/verificar_funcionamiento.py` pasó imports, arranque y títulos de ambas interfaces, PDF, embeddings, recarga FAISS de 26 chunks y lectura/escritura temporal. Se comprobó además `fecha_de_hoy` y la ruta de datos desde `ejemplos/`. El CSV original quedó intacto y el servidor de Marketing sigue respondiendo HTTP 200 en 8502.
+- No se volvieron a consumir llamadas a Groq ni a ejecutar el demo MCP: el cambio afecta organización, imports, rutas y títulos. Código compatible por construcción con Windows/macOS; la ejecución de esta verificación fue en Windows.
+
 ## Formato de entradas futuras
 
 Fecha / autor o rama / ID de tarea / decisión y alternativa / archivos afectados / comando y resultado / limitación o próximo paso. No registrar secretos ni copiar conversaciones completas.
